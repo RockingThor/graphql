@@ -4,12 +4,12 @@ const typeDefs = gql`
   type Query {
     greet: String
     users: [User]
-    user(id: ID!): User
+    user(_id: ID!): User
     quotes: [Quote]
     quote(by: String!): [Quote]
   }
   type User {
-    id: ID
+    _id: ID
     firstName: String
     lastName: String
     email: String
@@ -19,12 +19,20 @@ const typeDefs = gql`
     name: String
     by: String
   }
+  type Token {
+    token: String
+  }
   type Mutation {
-    createUserDummy(userNew: UserInput): User
+    signupUser(userNew: UserInput!): User
+    signinUser(userData: UserSigninInput!): Token
   }
   input UserInput {
     firstName: String!
     lastName: String!
+    email: String!
+    password: String!
+  }
+  input UserSigninInput {
     email: String!
     password: String!
   }
