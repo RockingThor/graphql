@@ -5,27 +5,25 @@ import bcrypt from "bcryptjs";
 import Jwt from "jsonwebtoken";
 
 const User = mongoose.model("User");
+const Quote = mongoose.model("Quote");
 
 const resolvers = {
   Query: {
-    greet: () => {
-      return "Hello World";
+    users: async () => {
+      return await User.find({});
     },
-    users: () => {
-      return users;
+    quotes: async () => {
+      return await Quote.find({}).populate("by", "_id firstName lastName");
     },
-    quotes: () => {
-      return quotes;
+    user: async (_, { _id }) => {
+      return await User.findOne({ _id });
     },
-    user: (_, { _id }) => {
-      return users.find((user) => user._id == _id);
-    },
-    quote: (_, { by }) => {
-      return quotes.filter((quote) => quote.by === by);
+    quote: async (_, { by }) => {
+      return await Quote.findOne({ by });
     },
   },
   User: {
-    quotes: (ur) => quotes.filter((quote) => quote.by === ur._id),
+    quotes: async (ur) => await Quote.find({ by: ur._id }),
   },
   Mutation: {
     signupUser: async (_, { userNew }) => {
@@ -55,6 +53,17 @@ const resolvers = {
         }
       } else {
         throw new Error("No user found with the specified email");
+      }
+    },
+    createQuote: async (_, { name }, { userId }) => {
+      if (userId) {
+        const quote = new Quote({
+          name,
+          by: userId,
+        });
+        return await quote.save();
+      } else {
+        throw new Error("User must be logged in");
       }
     },
   },

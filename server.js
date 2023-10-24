@@ -3,6 +3,7 @@ import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-co
 import typeDefs from "./schemaGql.js";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import Jwt from "jsonwebtoken";
 
 dotenv.config();
 
@@ -26,6 +27,13 @@ import resolvers from "./resolvers.js";
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  context: async ({ req }) => {
+    const { authorization } = req.headers;
+    if (authorization) {
+      const { userId } = Jwt.verify(authorization, process.env.JWT_KEY);
+      return { userId };
+    }
+  },
   plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
 });
 

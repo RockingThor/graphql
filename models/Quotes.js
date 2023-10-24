@@ -11,4 +11,4 @@ const quoteSchema = new mongoose.Schema({
   },
 });
 
-mongoose.model("Quteo", quoteSchema);
+mongoose.model("Quote", quoteSchema);
